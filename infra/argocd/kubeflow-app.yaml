@@ -1,26 +1,14 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: kubeflow
-  namespace: argocd
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-spec:
-  project: mlops-platform
-  source:
-    repoURL: https://github.com/kubeflow/manifests.git
-    path: example/kustomize
-    targetRevision: v1.9.0
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: kubeflow
-  syncPolicy:
-    syncOptions:
-    - CreateNamespace=true
-    - Validate=false
-    retry:
-      limit: 5
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
+# Kustomize Plugin Configuration for Kubeflow v1.9.0
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - example # Updated path
+
+# Additional configuration for Kubeflow v1.9.0
+namePrefix: kf-
+images:
+  - name: kubeflow
+    newName: gcr.io/kubeflow-images-public/kubeflow
+    newTag: v1.9.0
+
