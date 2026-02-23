@@ -1,20 +1,21 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+# Content to deploy Kubeflow Pipelines (standalone)
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: kubeflow
-  namespace: argocd
+  name: pipelines-deployment
+  namespace: kubeflow-user-example-com
 spec:
-  project: mlops-platform
-  source:
-    repoURL: https://github.com/kubeflow/manifests.git
-    targetRevision: v1.9.0
-    path: applications/pipelines/upstream  # ← Kubeflow Pipelines (leve)
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: kubeflow
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipelines
+  template:
+    metadata:
+      labels:
+        app: pipelines
+    spec:
+      containers:
+        - name: pipelines-container
+          image: <kubeflow pipielines image>
+          ports:
+            - containerPort: 8888
