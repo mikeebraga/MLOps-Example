@@ -1,0 +1,50 @@
+auth:
+  rootUser: minioadmin
+  rootPassword: minioadmin
+
+mode: standalone
+
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClassName: "standard"
+
+service:
+  type: ClusterIP
+  port: 9000
+  annotations: {}
+
+consoleService:
+  type: ClusterIP
+  port: 9001
+  annotations: {}
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+livenessProbe:
+  httpGet:
+    path: /minio/health/live
+    port: 9000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /minio/health/ready
+    port: 9000
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+buckets:
+  - name: mlflow-artifacts
+    purge: false
+  - name: training-data
+    purge: false
+  - name: models
+    purge: false
