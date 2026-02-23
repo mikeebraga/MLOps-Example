@@ -3,36 +3,18 @@ kind: Application
 metadata:
   name: kubeflow
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
-
+  project: mlops-platform
   source:
-    repoURL: https://mahdikhashan.github.io/kubeflow-helm-chart   # repo Helm
-    chart: kubeflow                                               # nome do chart
-    targetRevision: 0.1.0                                         # versão do chart
-    helm:
-      values: |
-        # overrides mínimos de exemplo – ajusta para teu cluster
-        istio:
-          enabled: true
-        certManager:
-          enabled: true
-        auth:
-          staticUser:
-            email: admin@example.com
-            password: admin123
-
+    repoURL: https://github.com/kubeflow/manifests.git
+    targetRevision: v1.9.0
+    path: applications/pipelines/upstream  # ← Kubeflow Pipelines (leve)
   destination:
     server: https://kubernetes.default.svc
     namespace: kubeflow
-
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
-
-
+    - CreateNamespace=true
