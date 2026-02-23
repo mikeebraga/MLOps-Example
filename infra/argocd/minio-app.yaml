@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: mlops-platform
+  source:
+    repoURL: https://charts.min.io/
+    chart: minio
+    targetRevision: 5.0.0
+    helm:
+      releaseName: minio
+      values: |
+        auth:
+          rootUser: minioadmin
+          rootPassword: minioadmin
+        mode: standalone
+        persistence:
+          enabled: true
+          size: 10Gi
+        service:
+          type: ClusterIP
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
