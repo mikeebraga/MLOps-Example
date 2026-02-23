@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubeflow
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: mlops-platform
+  source:
+    repoURL: https://github.com/kubeflow/manifests.git
+    path: kustomize
+    targetRevision: v1.7.0
+    plugin:
+      name: kustomize
+      env:
+      - name: KUSTOMIZE_ENABLE_HELM_CHARTS
+        value: "true"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
