@@ -1,0 +1,29 @@
+controller:
+  replicaCount: 2
+  
+  service:
+    type: LoadBalancer
+    annotations:
+      cloud.google.com/neg: '{"ingress": true}'
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 90Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+  
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
+  
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "10254"
+  
+  config:
+    use-forwarded-headers: "true"
+    use-proxy-protocol: "false"
+    log-format-upstream: '$the_real_ip - $the_original_forwarder_for [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_time'
