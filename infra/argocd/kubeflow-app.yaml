@@ -1,14 +1,38 @@
-# Kustomize Plugin Configuration for Kubeflow v1.9.0
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubeflow
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
 
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - example # Updated path
+  source:
+    repoURL: https://mahdikhashan.github.io/kubeflow-helm-chart   # repo Helm
+    chart: kubeflow                                               # nome do chart
+    targetRevision: 0.1.0                                         # versão do chart
+    helm:
+      values: |
+        # overrides mínimos de exemplo – ajusta para teu cluster
+        istio:
+          enabled: true
+        certManager:
+          enabled: true
+        auth:
+          staticUser:
+            email: admin@example.com
+            password: admin123
 
-# Additional configuration for Kubeflow v1.9.0
-namePrefix: kf-
-images:
-  - name: kubeflow
-    newName: gcr.io/kubeflow-images-public/kubeflow
-    newTag: v1.9.0
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeflow
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
 
